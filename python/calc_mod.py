@@ -11,7 +11,7 @@ from numpy.linalg import inv,lstsq
 def ace(image, hz, dx):
     imC2= 0.299*image[:,:,0] + 0.587*image[:,:,1] + 0.114*image[:,:,2]
     #Binarización de la blanco y negro
-    CB=np.where(imC2<35,0,255)
+    CB=np.where(imC2>200,0,255)
     imfil1=nd.median_filter(CB,(10,10)) #Filtro paso mediano
     kernel=1/25*np.ones((5,5),dtype=int)
     suave=nd.convolve(imfil1,kernel)
@@ -22,7 +22,7 @@ def ace(image, hz, dx):
     lbl,n = nd.label(suave)
     X,Y=[],[]
     for j in range(1,n+1):
-        Y.append(nd.measurements.center_of_mass(suave, lbl, [j])[0][0])
+        Y.append(nd.measurements.center_of_mass(suave, lbl, [j])[0][0]*dx)
         #X.append(nd.measurements.center_of_mass(suave, lbl, [j])[0][1])
     Y.sort()
     Y.pop(0)
@@ -38,11 +38,11 @@ def ace(image, hz, dx):
     Xt=[]
     for fun in f:
         Xt.append(fun(dt))   
-    Xt= np.array(Xt)*dx
+    Xt= np.array(Xt)
     X=Xt.transpose()
     #L=[0,image,imfil1,lbl]
     print("la aceleración es:")
-    print(lstsq(X,Y)[0][2])
+    print(lstsq(X,Y,rcond=-1)[0][2])
     
 #image1=imread("Bolas1.tif") 
 #print(ace(image1,5.3,0.2))   
