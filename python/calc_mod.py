@@ -11,7 +11,10 @@ from numpy.linalg import inv,lstsq
 def ace(image, hz, dx):
     imC2= 0.299*image[:,:,0] + 0.587*image[:,:,1] + 0.114*image[:,:,2]
     #Binarización de la blanco y negro
-    CB=np.where(imC2>200,0,255)
+    if  np.average(imC2)<255/2:   #fondo negro
+        CB=np.where(imC2<35,0,255)
+    else:
+        CB=np.where(imC2>200,0,255)
     imfil1=nd.median_filter(CB,(10,10)) #Filtro paso mediano
     kernel=1/25*np.ones((5,5),dtype=int)
     suave=nd.convolve(imfil1,kernel)
