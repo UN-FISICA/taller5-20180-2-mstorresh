@@ -15,7 +15,7 @@ def ace(image, hz, dx):
         CB=np.where(imC2<35,0,255)
     else:
         CB=np.where(imC2>200,0,255)
-    imfil1=nd.median_filter(CB,(10,10)) #Filtro paso mediano
+    imfil1=nd.median_filter(CB,(3,3)) #Filtro paso mediano
     kernel=1/25*np.ones((5,5),dtype=int)
     suave=nd.convolve(imfil1,kernel)
     lblim,n=nd.label(CB)
