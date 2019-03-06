@@ -128,12 +128,13 @@ def Xn(x):
 def mult(x,y):
     c3arr = cvarray(shape=(int(x.shape[0]),int(y.shape[1])), itemsize=sizeof(double), format="d")
     cdef double [:, :] c3arr_view = c3arr
-    for i in range(len(x)):
-        for j in range(len(y[0])):
-            for k in range(len(y)):
-                c3arr_view[i][j] += x[i][k] * y[k][j] 
-            
-    return(c3arr_view)      
+    for i in range(x.shape[0]):
+        for j in range(y.shape[1]):
+            c3arr_view[i][j]=0
+            for k in range(y.shape[0]):
+                c3arr_view[i][j] += x[i][k] * y[k][j]   
+    return(c3arr_view)    
+    
 def inver(x):
     c4arr = cvarray(shape=(3,3), itemsize=sizeof(double), format="d")
     cdef double [:, :] c4arr_view = c4arr
@@ -148,10 +149,13 @@ def inver(x):
     c4arr_view[2][1] = (x[0][1]*x[2][0] - x[0][0]*x[2][1])/detA
     c4arr_view[2][2] = (x[0][0]*x[1][1] - x[0][1]*x[1][0])/detA
     return (c4arr_view)
-g=mult(Xt(cyarr_view),Xn(c2arr_view))      
+g=mult(Xt(cyarr_view),Xn(c2arr_view))
 p=inver(g)
 u=mult(p,Xt(cyarr_view))
 w=cm(lbl(y)[0],lbl(y)[1])
 r=mult(u,w)
 print(r[2][0])
 
+
+
+    
