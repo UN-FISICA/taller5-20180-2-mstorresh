@@ -5,7 +5,7 @@ from cpython cimport array
 import array
 import numpy as np
 import matplotlib.pyplot as plt
-image=plt.imread('Bolas1.tif')
+image=plt.imread('b2.jpeg')
 #image=plt.imread('b1.jpeg')
 gray=0.299*image[:,:,0]+0.587*image[:,:,1]+0.114*image[:,:,2]
 narr = gray
@@ -71,9 +71,9 @@ def lbl(x):
             b+=1
     cdef double[:,:] x_view=x
     return(x_view,b)
-y=bina(narr_view)
 
-def cm(x,l):
+
+def cm(x,l,dx1):
    #a=arr(int(l)-2,0)
    c0arr = cvarray(shape=(int(l)-2,1), itemsize=sizeof(double), format="d")
    cdef double [:, :] c0arr_view = c0arr    
@@ -90,17 +90,20 @@ def cm(x,l):
                    cn+=1
                    n+=1
            cm+=cn*i
-       c0arr_view[k-2]=cm/n *dx
+       c0arr_view[k-2]=cm/n *dx1
                    
    return(c0arr_view)
-
-cyarr = cvarray(shape=(3,int(lbl(y)[1]-2)), itemsize=sizeof(double), format="d")
-cdef double [:, :] cyarr_view = cyarr
-Dt = arr(int(lbl(y)[1])-2,0)   
-for i in range(0,int(Dt.shape[0])):
-    Dt[i]=i/hz
+"""
+def dt(z):    
+    Dt1 = arr(int(lbl(K)[1])-2,0)   
+    for i in range(0,int(Dt1.shape[0])):
+        Dt1[i]=i/z
+    cdef double[:] Dt1_view=Dt1
+    return(Dt1_view)
 #print(type(lbl(y)[1])) 
-def Xt(x):
+"""
+def Xt(x,d):
+    Dt=d
     for i in range(x.shape[0]):
         for j in range (x.shape[1]):
             if i==0:
@@ -111,9 +114,9 @@ def Xt(x):
                 x[i][j]=(Dt[j]**2)/2
     cdef double[:,:] x_view=x
     return(x_view)
-c2arr = cvarray(shape=(int(lbl(y)[1]-2),3), itemsize=sizeof(double), format="d")
-cdef double [:, :] c2arr_view = c2arr
-def Xn(x):
+
+def Xn(x,d):
+    Dt=d
     for i in range(x.shape[0]):
         for j in range(x.shape[1]):
             if j==0:
@@ -149,10 +152,19 @@ def inver(x):
     c4arr_view[2][1] = (x[0][1]*x[2][0] - x[0][0]*x[2][1])/detA
     c4arr_view[2][2] = (x[0][0]*x[1][1] - x[0][1]*x[1][0])/detA
     return (c4arr_view)
-g=mult(Xt(cyarr_view),Xn(c2arr_view))
+
+K=bina(narr_view)
+cyarr = cvarray(shape=(3,int(lbl(K)[1]-2)), itemsize=sizeof(double), format="d")
+cdef double [:, :] cyarr_view = cyarr
+c2arr = cvarray(shape=(int(lbl(K)[1]-2),3), itemsize=sizeof(double), format="d")
+cdef double [:, :] c2arr_view = c2arr
+Dt = arr(int(lbl(K)[1])-2,0)   
+for i in range(0,int(Dt.shape[0])):
+    Dt[i]=i/hz
+g=mult(Xt(cyarr_view,Dt),Xn(c2arr_view,Dt))
 p=inver(g)
-u=mult(p,Xt(cyarr_view))
-w=cm(lbl(y)[0],lbl(y)[1])
+u=mult(p,Xt(cyarr_view,Dt))
+w=cm(lbl(K)[0],lbl(K)[1],dx)
 r=mult(u,w)
 print(r[2][0])
 
