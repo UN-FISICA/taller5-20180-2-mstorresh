@@ -5,13 +5,8 @@ from cpython cimport array
 import array
 import numpy as np
 import matplotlib.pyplot as plt
-image=plt.imread('b2.jpeg')
+image=plt.imread('b1.jpeg')
 #image=plt.imread('b1.jpeg')
-gray=0.299*image[:,:,0]+0.587*image[:,:,1]+0.114*image[:,:,2]
-narr = gray
-cdef double [:, :] narr_view = narr
-cdef double hz=2.0
-cdef double dx = 0.5
 #plt.imshow(gray)
 def prom(x): #promedio de los valores dentro de la matriz
     a = 0
@@ -153,21 +148,25 @@ def inver(x):
     c4arr_view[2][2] = (x[0][0]*x[1][1] - x[0][1]*x[1][0])/detA
     return (c4arr_view)
 
-K=bina(narr_view)
-cyarr = cvarray(shape=(3,int(lbl(K)[1]-2)), itemsize=sizeof(double), format="d")
-cdef double [:, :] cyarr_view = cyarr
-c2arr = cvarray(shape=(int(lbl(K)[1]-2),3), itemsize=sizeof(double), format="d")
-cdef double [:, :] c2arr_view = c2arr
-Dt = arr(int(lbl(K)[1])-2,0)   
-for i in range(0,int(Dt.shape[0])):
-    Dt[i]=i/hz
-g=mult(Xt(cyarr_view,Dt),Xn(c2arr_view,Dt))
-p=inver(g)
-u=mult(p,Xt(cyarr_view,Dt))
-w=cm(lbl(K)[0],lbl(K)[1],dx)
-r=mult(u,w)
-print(r[2][0])
+def ace(image,hz,dx):
+    gray=0.299*image[:,:,0]+0.587*image[:,:,1]+0.114*image[:,:,2]
+    narr = gray
+    cdef double [:, :] narr_view = narr
+    K=bina(narr_view)
+    cyarr = cvarray(shape=(3,int(lbl(K)[1]-2)), itemsize=sizeof(double), format="d")
+    cdef double [:, :] cyarr_view = cyarr
+    c2arr = cvarray(shape=(int(lbl(K)[1]-2),3), itemsize=sizeof(double), format="d")
+    cdef double [:, :] c2arr_view = c2arr
+    Dt = arr(int(lbl(K)[1])-2,0)   
+    for i in range(0,int(Dt.shape[0])):
+        Dt[i]=i/hz
+    g=mult(Xt(cyarr_view,Dt),Xn(c2arr_view,Dt))
+    p=inver(g)
+    u=mult(p,Xt(cyarr_view,Dt))
+    w=cm(lbl(K)[0],lbl(K)[1],dx)
+    r=mult(u,w)
+    print(r[2][0])
 
-
+print(ace(image,2.0,0.5))
 
     
