@@ -148,7 +148,7 @@ def inver(x):
     c4arr_view[2][2] = (x[0][0]*x[1][1] - x[0][1]*x[1][0])/detA
     return (c4arr_view)
 
-def ace(image,hz,dx):
+def calc(image,hz,dx):
     gray=0.299*image[:,:,0]+0.587*image[:,:,1]+0.114*image[:,:,2]
     narr = gray
     cdef double [:, :] narr_view = narr
@@ -167,6 +167,6 @@ def ace(image,hz,dx):
     r=mult(u,w)
     print(r[2][0])
 
-print(ace(image,2.0,0.5))
+
 
     
